@@ -59,7 +59,6 @@
       cursor: default;
       opacity: 0.75;
     }
-    /* 2x XP TIMER BOX (sidebar version) */
     #double-xp-timer-box {
       display: none;
       background: #fff;
@@ -75,7 +74,6 @@
       letter-spacing: 1px;
       margin: 0.5rem auto 0 auto;
       transition: opacity 0.4s;
-      /* No Akaya font, uses default font-sans! */
       font-family: inherit;
     }
     #double-xp-timer-box.show {
@@ -86,13 +84,24 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.2s;
+      
+      /* Fade transition for modal */
+.inventory-fade {
+  opacity: 0;
+  transition: opacity 0s ease;
+  pointer-events: none;
+}
+.inventory-fade.show {
+  opacity: 1;
+  pointer-events: auto;
+}
     }
   </style>
 </head>
 <body class="bg-[#1E1E1E] text-white font-sans flex">
 
   <!-- Sidebar -->
-  <aside class="w-64 bg-[#2A2A2A] min-h-screen p-6 flex flex-col gap-6">
+  <aside class="w-64 bg-[#2A2A2A] min-h-screen p-6 flex flex-col gap-">
     <!-- Streak at top -->
     <div class="bg-[#1E1E1E] p-4 rounded-xl text-center shadow-lg">
       <p class="text-3xl font-bold">🔥 <span id="streak-days">0</span> Day Streak!</p>
@@ -103,7 +112,7 @@
         <p id="xp-text" class="text-yellow-400 text-sm text-center mt-1">XP: 0 / 10</p>
         <p id="total-xp-text" class="text-yellow-300 text-xs text-center mt-1">Total XP: 0</p>
         <button id="double-xp-btn" class="mt-2 w-full bg-purple-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-800 transition text-base">
-          2x XP (ad)
+          2x XP (Free)
         </button>
         <div id="double-xp-timer-box">
           <span id="double-xp-timer-text">2x XP active: 10:00</span>
@@ -111,7 +120,7 @@
       </div>
     </div>
     <div>
-      <h2 class="text-xl font-bold mb-2">Languages</h2>
+      <h2 class="text-xl font-bold mb-2"></h2>
       <button id="lang-toggle" class="bg-red-600 text-white px-4 py-2 rounded-lg akaya text-xl w-full">
         Japanese
       </button>
@@ -119,9 +128,25 @@
         <button id="hiragana-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg akaya text-lg w-11/12 ml-2">
           Hiragana
         </button>
+        <button id="katakana-btn" class="bg-blue-500 text-white px-4 py-2 rounded-lg akaya text-lg w-11/12 ml-2">
+          Katakana
+        </button>
+        <button id="kanji-btn" class="bg-yellow-500 text-white px-4 py-2 rounded-lg akaya text-lg w-11/12 ml-2">
+          Kanji
+        </button>
+        <button id="words-btn" class="bg-green-500 text-white px-4 py-2 rounded-lg akaya text-lg w-11/12 ml-2">
+          Words
+        </button>
+      
       </div>
     </div>
+    <button id="open-inventory-btn" class="w-full bg-green-700 text-white py-2 rounded-lg mt-4 hover:bg-green-800 text-lg font-bold">
+  🍵 Inventory
+</button>
+
+  
   </aside>
+  
 
   <!-- Main Content -->
   <div class="flex-1 relative">
@@ -134,18 +159,58 @@
         <p class="text-lg text-center">Welcome to Language せんせい!</p>
       </div>
     </div>
+    <!-- Hiragana Section -->
     <div id="hiragana-section" class="relative z-10 mt-16 px-6 fade-transition hidden">
       <div class="max-w-2xl mx-auto">
         <div id="hiragana-grid" class="grid grid-cols-5 gap-2"></div>
         <div class="flex justify-between mt-4">
-          <button id="select-all-btn" class="bg-green-600 px-4 py-2 rounded-lg akaya text-white hover:bg-green-700">Select All</button>
-          <button id="deselect-all-btn" class="bg-red-600 px-4 py-2 rounded-lg akaya text-white hover:bg-red-700">Deselect All</button>
+          <button id="select-all-btn-h" class="bg-green-600 px-4 py-2 rounded-lg akaya text-white hover:bg-green-700">Select All</button>
+          <button id="deselect-all-btn-h" class="bg-red-600 px-4 py-2 rounded-lg akaya text-white hover:bg-red-700">Deselect All</button>
         </div>
-        <button id="start-quiz-btn" class="bg-blue-600 mt-6 w-full py-3 rounded-lg akaya text-white text-xl hover:bg-blue-700">
+        <button id="start-quiz-btn-h" class="bg-blue-600 mt-6 w-full py-3 rounded-lg akaya text-white text-xl hover:bg-blue-700">
           Start Quiz
         </button>
       </div>
     </div>
+    <!-- Katakana Section -->
+    <div id="katakana-section" class="relative z-10 mt-16 px-6 fade-transition hidden">
+      <div class="max-w-2xl mx-auto">
+        <div id="katakana-grid" class="grid grid-cols-5 gap-2"></div>
+        <div class="flex justify-between mt-4">
+          <button id="select-all-btn-k" class="bg-green-600 px-4 py-2 rounded-lg akaya text-white hover:bg-green-700">Select All</button>
+          <button id="deselect-all-btn-k" class="bg-red-600 px-4 py-2 rounded-lg akaya text-white hover:bg-red-700">Deselect All</button>
+        </div>
+        <button id="start-quiz-btn-k" class="bg-blue-600 mt-6 w-full py-3 rounded-lg akaya text-white text-xl hover:bg-blue-700">
+          Start Quiz
+        </button>
+      </div>
+    </div>
+    <!-- Kanji Section -->
+    <div id="kanji-section" class="relative z-10 mt-16 px-6 fade-transition hidden">
+      <div class="max-w-2xl mx-auto">
+        <div id="kanji-grid" class="grid grid-cols-5 gap-2"></div>
+        <div class="flex justify-between mt-4">
+          <button id="select-all-btn-kanji" class="bg-green-600 px-4 py-2 rounded-lg akaya text-white hover:bg-green-700">Select All</button>
+          <button id="deselect-all-btn-kanji" class="bg-red-600 px-4 py-2 rounded-lg akaya text-white hover:bg-red-700">Deselect All</button>
+        </div>
+        <button id="start-quiz-btn-kanji" class="bg-blue-600 mt-6 w-full py-3 rounded-lg akaya text-white text-xl hover:bg-blue-700">
+          Start Quiz
+        </button>
+      </div>
+    </div>
+    <!-- Words Section -->
+    <div id="words-section" class="relative z-10 mt-16 px-6 fade-transition hidden">
+      <div class="max-w-2xl mx-auto">
+        <div class="text-center text-white text-xl mb-3">Match the word with its correct hiragana!</div>
+        <div id="words-quiz-container"></div>
+        <button id="start-quiz-btn-words" class="bg-blue-600 mt-6 w-full py-3 rounded-lg akaya text-white text-xl hover:bg-blue-700">
+          Start Word Quiz
+        </button>
+      </div>
+      
+    </div>
+    
+    <!-- Quiz Section (reused) -->
     <div id="quiz-container" class="relative z-10 mt-16 px-6 max-w-2xl mx-auto hidden fade-transition">
       <p id="quiz-question" class="text-5xl akaya mb-6" style="color: white;"></p>
       <div id="choices-container" class="flex flex-col"></div>
@@ -156,34 +221,38 @@
       <p id="feedback" class="text-lg min-h-[24px] mt-4"></p>
       <p id="score-display" class="text-lg font-bold mt-2"></p>
     </div>
+    <!-- Words Quiz Only Section (choices handled separately) -->
+    <div id="words-quiz-game" class="relative z-10 mt-16 px-6 max-w-2xl mx-auto hidden fade-transition">
+      <div id="words-quiz-word" class="text-3xl font-bold text-center mb-6"></div>
+      <div id="words-quiz-choices" class="flex flex-wrap justify-center gap-4 mb-6"></div>
+      <p id="words-quiz-feedback" class="text-lg min-h-[24px] mt-4 text-center"></p>
+      <p id="words-quiz-score" class="text-lg font-bold mt-2 text-center"></p>
+      <button id="words-quiz-next-btn" class="hidden bg-blue-600 mx-auto px-5 py-2 rounded-lg akaya text-white text-lg hover:bg-blue-700">Next</button>
+      <button id="words-quiz-finish-btn" class="hidden bg-green-600 mx-auto px-5 py-2 rounded-lg akaya text-white text-lg hover:bg-green-700">Finish</button>
+      <button id="words-quiz-back-btn" class="bg-gray-600 mx-auto px-5 py-2 rounded-lg akaya text-white text-lg hover:bg-gray-700 mt-6 hidden">Go Back</button>
+    </div>
   </div>
-
+<!-- Inventory Modal -->
+<div id="inventory-modal" class="inventory-fade" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(20,20,20,0.6); z-index:1000; align-items:center; justify-content:center;">
+  <div style="background:#222; border-radius:16px; padding:2rem 2.5rem; min-width:320px; max-width:90vw; color:#fff; position:relative; box-shadow:0 6px 48px #000b;">
+    <button id="close-inventory-btn" style="position:absolute; top:12px; right:16px; font-size:1.7rem; background:none; border:none; color:#aaa; cursor:pointer;">&times;</button>
+    <h2 class="text-2xl font-bold mb-6 text-center">Inventory</h2>
+    <div class="flex items-center gap-4 mb-5">
+      <span style="font-size:2.4rem;">🍵</span>
+      <div>
+        <div class="font-bold text-lg">Green Tea</div>
+        <div class="text-green-300 mb-2">Count: <span id="green-tea-count-modal">0</span> / 50</div>
+        <div class="text-xs text-gray-400 mb-2">+15 XP per use</div>
+        <button onclick="useGreenTea(true)" id="use-green-tea-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold">Use Green Tea</button>
+      </div>
+    </div>
+    <div class="text-gray-400 text-sm text-center">
+      Next Green Tea in: <span id="green-tea-timer">05:00</span>
+    </div>
+  </div>
+</div>
   <script>
-    // --- Declarations ---
-    const langToggle = document.getElementById('lang-toggle');
-    const langOptions = document.getElementById('lang-options');
-    const hiraganaBtn = document.getElementById('hiragana-btn');
-    const welcomeText = document.getElementById('welcome-text');
-    const hiraganaSection = document.getElementById('hiragana-section');
-    const curvedTop = document.getElementById('curved-top');
-    const hiraganaGrid = document.getElementById('hiragana-grid');
-    const startQuizBtn = document.getElementById('start-quiz-btn');
-    const quizContainer = document.getElementById('quiz-container');
-    const quizQuestion = document.getElementById('quiz-question');
-    const choicesContainer = document.getElementById('choices-container');
-    const skipQuestionBtn = document.getElementById('skip-question-btn');
-    const feedback = document.getElementById('feedback');
-    const scoreDisplay = document.getElementById('score-display');
-    const goBackBtn = document.getElementById('go-back-btn');
-    const streakDaysEl = document.getElementById('streak-days');
-    const xpBarFill = document.getElementById('xp-bar-fill');
-    const xpText = document.getElementById('xp-text');
-    const totalXpText = document.getElementById('total-xp-text');
-    const doubleXpBtn = document.getElementById('double-xp-btn');
-    // 2x XP Timer Box
-    const doubleXpTimerBox = document.getElementById('double-xp-timer-box');
-    const doubleXpTimerText = document.getElementById('double-xp-timer-text');
-
+    // --- Character Sets ---
     const hiraganaCharacters = [
       ['あ', 'a'], ['い', 'i'], ['う', 'u'], ['え', 'e'], ['お', 'o'],
       ['か', 'ka'], ['き', 'ki'], ['く', 'ku'], ['け', 'ke'], ['こ', 'ko'],
@@ -197,10 +266,95 @@
       ['わ', 'wa'], ['を', 'wo'], ['ん', 'n']
     ];
 
+    const katakanaCharacters = [
+      ['ア', 'a'], ['イ', 'i'], ['ウ', 'u'], ['エ', 'e'], ['オ', 'o'],
+      ['カ', 'ka'], ['キ', 'ki'], ['ク', 'ku'], ['ケ', 'ke'], ['コ', 'ko'],
+      ['サ', 'sa'], ['シ', 'shi'], ['ス', 'su'], ['セ', 'se'], ['ソ', 'so'],
+      ['タ', 'ta'], ['チ', 'chi'], ['ツ', 'tsu'], ['テ', 'te'], ['ト', 'to'],
+      ['ナ', 'na'], ['ニ', 'ni'], ['ヌ', 'nu'], ['ネ', 'ne'], ['ノ', 'no'],
+      ['ハ', 'ha'], ['ヒ', 'hi'], ['フ', 'fu'], ['ヘ', 'he'], ['ホ', 'ho'],
+      ['マ', 'ma'], ['ミ', 'mi'], ['ム', 'mu'], ['メ', 'me'], ['モ', 'mo'],
+      ['ヤ', 'ya'], ['ユ', 'yu'], ['ヨ', 'yo'],
+      ['ラ', 'ra'], ['リ', 'ri'], ['ル', 'ru'], ['レ', 're'], ['ロ', 'ro'],
+      ['ワ', 'wa'], ['ヲ', 'wo'], ['ン', 'n']
+    ];
+
+    // 50+ basic kanji (first grade/common) and readings:
+    const kanjiCharacters = [
+      ['日', 'にち'], ['一', 'いち'], ['国', 'くに'], ['人', 'ひと'], ['年', 'ねん'],
+      ['大', 'おお'], ['十', 'じゅう'], ['二', 'に'], ['本', 'ほん'], ['中', 'なか'],
+      ['長', 'なが'], ['出', 'で'], ['三', 'さん'], ['時', 'じ'], ['行', 'い'],
+      ['見', 'み'], ['月', 'つき'], ['分', 'ふん'], ['後', 'あと'], ['前', 'まえ'],
+      ['生', 'せい'], ['五', 'ご'], ['間', 'あいだ'], ['上', 'うえ'], ['東', 'ひがし'],
+      ['四', 'よん'], ['今', 'いま'], ['金', 'きん'], ['九', 'きゅう'], ['入', 'い'],
+      ['学', 'がく'], ['高', 'たか'], ['円', 'えん'], ['子', 'こ'], ['外', 'そと'],
+      ['八', 'はち'], ['六', 'ろく'], ['下', 'した'], ['来', 'く'], ['気', 'き'],
+      ['小', 'ちい'], ['七', 'なな'], ['山', 'やま'], ['話', 'はなし'], ['女', 'おんな'],
+      ['北', 'きた'], ['午', 'ご'], ['百', 'ひゃく'], ['書', 'か'], ['先', 'さき']
+    ];
+
+    // 50 Simple Common Japanese words for the word-to-hiragana quiz
+    const commonWords = [
+      { word: "ありがとう", meaning: "thank you", romaji: "arigatou" },
+      { word: "こんにちは", meaning: "hello", romaji: "konnichiwa" },
+      { word: "さようなら", meaning: "goodbye", romaji: "sayounara" },
+      { word: "はい", meaning: "yes", romaji: "hai" },
+      { word: "いいえ", meaning: "no", romaji: "iie" },
+      { word: "おはよう", meaning: "good morning", romaji: "ohayou" },
+      { word: "こんばんは", meaning: "good evening", romaji: "konbanwa" },
+      { word: "すみません", meaning: "excuse me/sorry", romaji: "sumimasen" },
+      { word: "ごめんなさい", meaning: "I’m sorry", romaji: "gomennasai" },
+      { word: "おねがい", meaning: "please", romaji: "onegai" },
+      { word: "わかります", meaning: "I understand", romaji: "wakarimasu" },
+      { word: "わかりません", meaning: "I don't understand", romaji: "wakarimasen" },
+      { word: "たべます", meaning: "eat", romaji: "tabemasu" },
+      { word: "のみます", meaning: "drink", romaji: "nomimasu" },
+      { word: "みます", meaning: "see", romaji: "mimasu" },
+      { word: "ききます", meaning: "listen", romaji: "kikimasu" },
+      { word: "はなします", meaning: "speak", romaji: "hanashimasu" },
+      { word: "いきます", meaning: "go", romaji: "ikimasu" },
+      { word: "きます", meaning: "come", romaji: "kimasu" },
+      { word: "します", meaning: "do", romaji: "shimasu" },
+      { word: "ともだち", meaning: "friend", romaji: "tomodachi" },
+      { word: "せんせい", meaning: "teacher", romaji: "sensei" },
+      { word: "がくせい", meaning: "student", romaji: "gakusei" },
+      { word: "ひと", meaning: "person", romaji: "hito" },
+      { word: "いぬ", meaning: "dog", romaji: "inu" },
+      { word: "ねこ", meaning: "cat", romaji: "neko" },
+      { word: "いえ", meaning: "house", romaji: "ie" },
+      { word: "くるま", meaning: "car", romaji: "kuruma" },
+      { word: "でんしゃ", meaning: "train", romaji: "densha" },
+      { word: "えき", meaning: "station", romaji: "eki" },
+      { word: "やま", meaning: "mountain", romaji: "yama" },
+      { word: "かわ", meaning: "river", romaji: "kawa" },
+      { word: "はな", meaning: "flower", romaji: "hana" },
+      { word: "き", meaning: "tree", romaji: "ki" },
+      { word: "みず", meaning: "water", romaji: "mizu" },
+      { word: "おちゃ", meaning: "tea", romaji: "ocha" },
+      { word: "ごはん", meaning: "rice/meal", romaji: "gohan" },
+      { word: "さかな", meaning: "fish", romaji: "sakana" },
+      { word: "にく", meaning: "meat", romaji: "niku" },
+      { word: "やさい", meaning: "vegetable", romaji: "yasai" },
+      { word: "くだもの", meaning: "fruit", romaji: "kudamono" },
+      { word: "せかい", meaning: "world", romaji: "sekai" },
+      { word: "うみ", meaning: "sea", romaji: "umi" },
+      { word: "そら", meaning: "sky", romaji: "sora" },
+      { word: "きょう", meaning: "today", romaji: "kyou" },
+      { word: "あした", meaning: "tomorrow", romaji: "ashita" },
+      { word: "きのう", meaning: "yesterday", romaji: "kinou" },
+      { word: "としょかん", meaning: "library", romaji: "toshokan" },
+      { word: "がっこう", meaning: "school", romaji: "gakkou" }
+    ];
+
+    // --- State ---
     let quizItems = [];
     let currentIndex = 0;
     let score = 0;
     let questionMode = 0; // 0 = kana -> romaji, 1 = romaji -> kana
+    let quizType = ''; // "hiragana", "katakana", "kanji", "words"
+    let wordsQuizData = []; // {word, meaning, romaji}
+    let wordsQuizCurrent = 0;
+    let wordsQuizScore = 0;
 
     // XP/streak system variables
     const XP_PER_CORRECT = 2;
@@ -217,6 +371,158 @@
     let doubleXpInterval = null;
     const DOUBLE_XP_DURATION = 10 * 60 * 1000; // 10 minutes in ms
 
+    // --- Element References ---
+    const langToggle = document.getElementById('lang-toggle');
+    const langOptions = document.getElementById('lang-options');
+    const hiraganaBtn = document.getElementById('hiragana-btn');
+    const katakanaBtn = document.getElementById('katakana-btn');
+    const kanjiBtn = document.getElementById('kanji-btn');
+    const wordsBtn = document.getElementById('words-btn');
+    const welcomeText = document.getElementById('welcome-text');
+    const hiraganaSection = document.getElementById('hiragana-section');
+    const katakanaSection = document.getElementById('katakana-section');
+    const kanjiSection = document.getElementById('kanji-section');
+    const wordsSection = document.getElementById('words-section');
+    const curvedTop = document.getElementById('curved-top');
+    const hiraganaGrid = document.getElementById('hiragana-grid');
+    const katakanaGrid = document.getElementById('katakana-grid');
+    const kanjiGrid = document.getElementById('kanji-grid');
+    const startQuizBtnH = document.getElementById('start-quiz-btn-h');
+    const startQuizBtnK = document.getElementById('start-quiz-btn-k');
+    const startQuizBtnKanji = document.getElementById('start-quiz-btn-kanji');
+    const startQuizBtnWords = document.getElementById('start-quiz-btn-words');
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestion = document.getElementById('quiz-question');
+    const choicesContainer = document.getElementById('choices-container');
+    const skipQuestionBtn = document.getElementById('skip-question-btn');
+    const feedback = document.getElementById('feedback');
+    const scoreDisplay = document.getElementById('score-display');
+    const goBackBtn = document.getElementById('go-back-btn');
+    const streakDaysEl = document.getElementById('streak-days');
+    const xpBarFill = document.getElementById('xp-bar-fill');
+    const xpText = document.getElementById('xp-text');
+    const totalXpText = document.getElementById('total-xp-text');
+    const doubleXpBtn = document.getElementById('double-xp-btn');
+    // 2x XP Timer Box
+    const doubleXpTimerBox = document.getElementById('double-xp-timer-box');
+    const doubleXpTimerText = document.getElementById('double-xp-timer-text');
+
+    // Words quiz game elements
+    const wordsQuizContainer = document.getElementById('words-quiz-container');
+    const wordsQuizGame = document.getElementById('words-quiz-game');
+    const wordsQuizWord = document.getElementById('words-quiz-word');
+    const wordsQuizChoices = document.getElementById('words-quiz-choices');
+    const wordsQuizFeedback = document.getElementById('words-quiz-feedback');
+    const wordsQuizScoreElem = document.getElementById('words-quiz-score');
+    const wordsQuizNextBtn = document.getElementById('words-quiz-next-btn');
+    const wordsQuizBackBtn = document.getElementById('words-quiz-back-btn');
+    const wordsQuizFinishBtn = document.getElementById('words-quiz-finish-btn');
+
+
+// --- Green Tea Inventory System with Modal Menu ---
+let greenTeaCount = 0;
+const GREEN_TEA_MAX = 50;
+const GREEN_TEA_INTERVAL = 5 * 60 * 1000; // 5 min in ms
+let greenTeaTimer = null;
+let greenTeaLastGiven = parseInt(localStorage.getItem('languageSenseiGreenTeaLastGiven'), 10) || Date.now();
+
+function saveGreenTea() {
+  localStorage.setItem('languageSenseiGreenTea', greenTeaCount);
+  localStorage.setItem('languageSenseiGreenTeaLastGiven', greenTeaLastGiven);
+}
+
+function loadGreenTea() {
+  greenTeaCount = parseInt(localStorage.getItem('languageSenseiGreenTea'), 10) || 0;
+  greenTeaLastGiven = parseInt(localStorage.getItem('languageSenseiGreenTeaLastGiven'), 10) || Date.now();
+  updateGreenTeaDisplays();
+}
+
+// Give one green tea every 5 minutes if not maxed
+function startGreenTeaTimer() {
+  if (greenTeaTimer) clearInterval(greenTeaTimer);
+  greenTeaTimer = setInterval(() => {
+    updateGreenTeaTimerDisplay();
+    if (greenTeaCount < GREEN_TEA_MAX) {
+      let now = Date.now();
+      if (now - greenTeaLastGiven >= GREEN_TEA_INTERVAL) {
+        greenTeaCount++;
+        greenTeaLastGiven = now;
+        saveGreenTea();
+        updateGreenTeaDisplays();
+        showGreenTeaMsg("🍵 You received a Green Tea! (" + greenTeaCount + "/" + GREEN_TEA_MAX + ")");
+      }
+    }
+  }, 1000);
+}
+
+function getNextGreenTeaTimeLeft() {
+  if (greenTeaCount >= GREEN_TEA_MAX) return 0;
+  let now = Date.now();
+  let timePassed = now - greenTeaLastGiven;
+  let left = GREEN_TEA_INTERVAL - timePassed;
+  return left > 0 ? left : 0;
+}
+
+function formatTime(ms) {
+  let total = Math.ceil(ms/1000);
+  let min = Math.floor(total/60);
+  let sec = total%60;
+  return `${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
+}
+
+function updateGreenTeaTimerDisplay() {
+  const timerEl = document.getElementById('green-tea-timer');
+  if (timerEl) {
+    let left = getNextGreenTeaTimeLeft();
+    timerEl.textContent = greenTeaCount >= GREEN_TEA_MAX ? "Full" : formatTime(left);
+  }
+}
+
+function updateGreenTeaDisplays() {
+  let el1 = document.getElementById('green-tea-count');
+  let el2 = document.getElementById('green-tea-count-modal');
+  if (el1) el1.textContent = greenTeaCount;
+  if (el2) el2.textContent = greenTeaCount;
+  updateGreenTeaTimerDisplay();
+}
+
+function useGreenTea(fromModal) {
+  if (greenTeaCount > 0) {
+    greenTeaCount--;
+    saveGreenTea();
+    updateGreenTeaDisplays();
+    addXP(15); // +15 XP per use
+    showGreenTeaMsg("🍵 You used a Green Tea! +15 XP");
+    if (fromModal) updateGreenTeaDisplays();
+  } else {
+    showGreenTeaMsg("No Green Tea to use!");
+  }
+}
+
+function showGreenTeaMsg(msg) {
+  // You can make this fancier (e.g., toast) if you wish
+  alert(msg);
+}
+
+// --- Inventory Menu Modal logic ---
+function openInventoryMenu() {
+  const modal = document.getElementById('inventory-modal');
+  modal.style.display = "flex";
+  setTimeout(() => modal.classList.add('show'), 10); // allow reflow for transition
+  updateGreenTeaDisplays();
+}
+
+function closeInventoryMenu() {
+  const modal = document.getElementById('inventory-modal');
+  modal.classList.remove('show');
+  setTimeout(() => modal.style.display = "none", 10); // matches CSS transition time
+}
+
+// Button listeners (add at end of script)
+document.getElementById('open-inventory-btn').onclick = openInventoryMenu;
+document.getElementById('close-inventory-btn').onclick = closeInventoryMenu;
+
+    // --- Progress/XP logic ---
     function getTodayString() {
       const now = new Date();
       return now.toISOString().slice(0, 10);
@@ -234,7 +540,6 @@
       totalXP = savedTotalXP !== null ? parseInt(savedTotalXP, 10) : 0;
       lastStreakDate = savedLastStreakDate || null;
 
-      // Handle 2x XP restore
       if (savedDoubleXp) {
         const until = parseInt(savedDoubleXp, 10);
         if (Date.now() < until) {
@@ -352,36 +657,13 @@
       doubleXpTimerText.textContent = `2x XP active: ${formatTimeLeft(msLeft)}`;
     }
 
-    // --- 2x XP Button Handler ---
     doubleXpBtn.addEventListener('click', function(e) {
       e.stopPropagation();
       if (doubleXpBtn.disabled) return;
       activateDoubleXp();
     });
 
-    // --- Dropdown and Quiz Logic (unchanged) ---
-    function loadHiraganaCharacters() {
-      hiraganaGrid.innerHTML = '';
-      hiraganaCharacters.forEach(([kana, romaji]) => {
-        const label = document.createElement('label');
-        label.className = "flex flex-col items-center bg-red-600 rounded-lg p-2 cursor-pointer select-none";
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.value = romaji;
-        checkbox.className = 'mb-1';
-        const spanKana = document.createElement('span');
-        spanKana.className = 'text-3xl akaya';
-        spanKana.textContent = kana;
-        const spanRomaji = document.createElement('span');
-        spanRomaji.className = 'text-sm';
-        spanRomaji.textContent = `(${romaji})`;
-        label.appendChild(checkbox);
-        label.appendChild(spanKana);
-        label.appendChild(spanRomaji);
-        hiraganaGrid.appendChild(label);
-      });
-    }
-
+    // --- Dropdown logic ---
     langToggle.addEventListener('click', function(e) {
       if (langOptions.classList.contains('hidden')) {
         langOptions.classList.remove('hidden');
@@ -400,35 +682,146 @@
       }
     });
 
+    // --- Section nav logic ---
+    function hideAllSections() {
+      [hiraganaSection, katakanaSection, kanjiSection, wordsSection, quizContainer, wordsQuizGame].forEach(sec => {
+        if (!sec.classList.contains('hidden')) sec.classList.add('hidden');
+        sec.classList.remove('opacity-100');
+      });
+    }
+
     hiraganaBtn.addEventListener('click', function(e) {
+      quizType = 'hiragana';
+      hideAllSections();
       welcomeText.classList.add('opacity-0');
       setTimeout(() => {
         welcomeText.classList.add('hidden');
         hiraganaSection.classList.remove('hidden');
         setTimeout(() => hiraganaSection.classList.add('opacity-100'), 10);
         hiraganaSection.classList.remove('opacity-0');
-        loadHiraganaCharacters();
+        loadKanaCharacters(hiraganaGrid, hiraganaCharacters, 'h');
       }, 500);
     });
 
-    document.getElementById('select-all-btn').addEventListener('click', function(e) {
-      document.querySelectorAll('#hiragana-grid input[type="checkbox"]').forEach(cb => cb.checked = true);
+    katakanaBtn.addEventListener('click', function(e) {
+      quizType = 'katakana';
+      hideAllSections();
+      welcomeText.classList.add('opacity-0');
+      setTimeout(() => {
+        welcomeText.classList.add('hidden');
+        katakanaSection.classList.remove('hidden');
+        setTimeout(() => katakanaSection.classList.add('opacity-100'), 10);
+        katakanaSection.classList.remove('opacity-0');
+        loadKanaCharacters(katakanaGrid, katakanaCharacters, 'k');
+      }, 500);
     });
 
-    document.getElementById('deselect-all-btn').addEventListener('click', function(e) {
+    kanjiBtn.addEventListener('click', function(e) {
+      quizType = 'kanji';
+      hideAllSections();
+      welcomeText.classList.add('opacity-0');
+      setTimeout(() => {
+        welcomeText.classList.add('hidden');
+        kanjiSection.classList.remove('hidden');
+        setTimeout(() => kanjiSection.classList.add('opacity-100'), 10);
+        kanjiSection.classList.remove('opacity-0');
+        loadKanaCharacters(kanjiGrid, kanjiCharacters, 'kanji');
+      }, 500);
+    });
+
+    wordsBtn.addEventListener('click', function(e) {
+      quizType = 'words';
+      hideAllSections();
+      welcomeText.classList.add('opacity-0');
+      setTimeout(() => {
+        welcomeText.classList.add('hidden');
+        wordsSection.classList.remove('hidden');
+        setTimeout(() => wordsSection.classList.add('opacity-100'), 10);
+        wordsSection.classList.remove('opacity-0');
+        wordsQuizContainer.innerHTML = '';
+      }, 500);
+    });
+
+    // --- Kana Grid Logic (for all) ---
+    function loadKanaCharacters(gridElem, chars, prefix) {
+      gridElem.innerHTML = '';
+      chars.forEach(([kana, reading]) => {
+        const label = document.createElement('label');
+        label.className = "flex flex-col items-center bg-red-600 rounded-lg p-2 cursor-pointer select-none";
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = reading;
+        checkbox.className = 'mb-1';
+        checkbox.name = prefix + '-kana-choice';
+        const spanKana = document.createElement('span');
+        spanKana.className = 'text-3xl akaya';
+        spanKana.textContent = kana;
+        const spanRomaji = document.createElement('span');
+        spanRomaji.className = 'text-sm';
+        spanRomaji.textContent = `(${reading})`;
+        label.appendChild(checkbox);
+        label.appendChild(spanKana);
+        label.appendChild(spanRomaji);
+        gridElem.appendChild(label);
+      });
+    }
+
+    // --- Select/Deselect All ---
+    document.getElementById('select-all-btn-h').addEventListener('click', function(e) {
+      document.querySelectorAll('#hiragana-grid input[type="checkbox"]').forEach(cb => cb.checked = true);
+    });
+    document.getElementById('deselect-all-btn-h').addEventListener('click', function(e) {
       document.querySelectorAll('#hiragana-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
     });
 
-    startQuizBtn.addEventListener('click', function(e) {
-      const selectedRomaji = Array.from(document.querySelectorAll('#hiragana-grid input[type="checkbox"]:checked'))
+    document.getElementById('select-all-btn-k').addEventListener('click', function(e) {
+      document.querySelectorAll('#katakana-grid input[type="checkbox"]').forEach(cb => cb.checked = true);
+    });
+    document.getElementById('deselect-all-btn-k').addEventListener('click', function(e) {
+      document.querySelectorAll('#katakana-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
+    });
+
+    document.getElementById('select-all-btn-kanji').addEventListener('click', function(e) {
+      document.querySelectorAll('#kanji-grid input[type="checkbox"]').forEach(cb => cb.checked = true);
+    });
+    document.getElementById('deselect-all-btn-kanji').addEventListener('click', function(e) {
+      document.querySelectorAll('#kanji-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
+    });
+
+    // --- Start Quiz Buttons ---
+    startQuizBtnH.addEventListener('click', function(e) {
+      startKanaQuiz('hiragana');
+    });
+    startQuizBtnK.addEventListener('click', function(e) {
+      startKanaQuiz('katakana');
+    });
+    startQuizBtnKanji.addEventListener('click', function(e) {
+      startKanaQuiz('kanji');
+    });
+
+    function startKanaQuiz(type) {
+      let gridId, chars;
+      if (type === 'hiragana') {
+        gridId = '#hiragana-grid';
+        chars = hiraganaCharacters;
+      } else if (type === 'katakana') {
+        gridId = '#katakana-grid';
+        chars = katakanaCharacters;
+      } else if (type === 'kanji') {
+        gridId = '#kanji-grid';
+        chars = kanjiCharacters;
+      }
+
+      const selected = Array.from(document.querySelectorAll(gridId + ' input[type="checkbox"]:checked'))
         .map(cb => cb.value);
 
-      if (selectedRomaji.length === 0) {
+      if (selected.length === 0) {
         alert('Please select at least one character to start the quiz!');
         return;
       }
 
-      quizItems = hiraganaCharacters.filter(([kana, romaji]) => selectedRomaji.includes(romaji));
+      quizType = type;
+      quizItems = chars.filter(([kana, reading]) => selected.includes(reading));
       quizItems = shuffleArray(quizItems);
       currentIndex = 0;
       score = 0;
@@ -436,9 +829,10 @@
       scoreDisplay.textContent = '';
       goBackBtn.classList.add('hidden');
 
-      hiraganaSection.classList.add('opacity-0');
+      let section = type === 'hiragana' ? hiraganaSection : type === 'katakana' ? katakanaSection : kanjiSection;
+      section.classList.add('opacity-0');
       setTimeout(() => {
-        hiraganaSection.classList.add('hidden');
+        section.classList.add('hidden');
         quizContainer.classList.remove('hidden');
         setCurvedVisibility(true);
         setTimeout(() => quizContainer.classList.add('opacity-100'), 10);
@@ -446,7 +840,7 @@
         loadProgress();
         showNextQuestion();
       }, 500);
-    });
+    }
 
     skipQuestionBtn.addEventListener('click', function(e) {
       feedback.textContent = '';
@@ -493,23 +887,36 @@
       scoreDisplay.textContent = `Score: ${score} / ${currentIndex}`;
       questionMode = Math.random() < 0.5 ? 0 : 1;
 
-      const [kana, romaji] = quizItems[currentIndex];
+      // select chars for this quiz
+      let chars;
+      if (quizType === 'hiragana') {
+        chars = hiraganaCharacters;
+      } else if (quizType === 'katakana') {
+        chars = katakanaCharacters;
+      } else if (quizType === 'kanji') {
+        chars = kanjiCharacters;
+      }
+      const [kana, reading] = quizItems[currentIndex];
       let questionText, correctAnswer, allOptions = [];
-      if (questionMode === 0) {
+      if (quizType === 'kanji') {
+        // Always Kanji -> hiragana quiz
         questionText = kana;
-        correctAnswer = romaji;
-        const wrongOptions = hiraganaCharacters
-          .filter(item => item[1] !== correctAnswer)
-          .map(item => item[1]);
+        correctAnswer = reading;
+        const wrongOptions = chars.filter(item => item[1] !== correctAnswer).map(item => item[1]);
+        shuffleArray(wrongOptions);
+        allOptions = wrongOptions.slice(0, 3);
+        allOptions.push(correctAnswer);
+      } else if (questionMode === 0) {
+        questionText = kana;
+        correctAnswer = reading;
+        const wrongOptions = chars.filter(item => item[1] !== correctAnswer).map(item => item[1]);
         shuffleArray(wrongOptions);
         allOptions = wrongOptions.slice(0, 3);
         allOptions.push(correctAnswer);
       } else {
-        questionText = romaji;
+        questionText = reading;
         correctAnswer = kana;
-        const wrongOptions = hiraganaCharacters
-          .filter(item => item[0] !== correctAnswer)
-          .map(item => item[0]);
+        const wrongOptions = chars.filter(item => item[0] !== correctAnswer).map(item => item[0]);
         shuffleArray(wrongOptions);
         allOptions = wrongOptions.slice(0, 3);
         allOptions.push(correctAnswer);
@@ -546,6 +953,113 @@
       });
     }
 
+    // --- Words Quiz ---
+    startQuizBtnWords.addEventListener('click', function(e) {
+      // Use random 20 from 50
+      wordsQuizData = shuffleArray(commonWords).slice(0, 20);
+      wordsQuizCurrent = 0;
+      wordsQuizScore = 0;
+      wordsQuizFeedback.textContent = '';
+      wordsQuizScoreElem.textContent = '';
+      wordsSection.classList.add('opacity-0');
+      setTimeout(() => {
+        wordsSection.classList.add('hidden');
+        wordsQuizGame.classList.remove('hidden');
+        setTimeout(() => wordsQuizGame.classList.add('opacity-100'), 10);
+        wordsQuizGame.classList.remove('opacity-0');
+        showWordsQuizQuestion();
+      }, 500);
+    });
+
+    function showWordsQuizQuestion() {
+      if (wordsQuizCurrent >= wordsQuizData.length) {
+        // Quiz done
+        wordsQuizWord.innerHTML = 'Quiz Complete!';
+        wordsQuizChoices.innerHTML = '';
+        wordsQuizFeedback.textContent = `Final score: ${wordsQuizScore} / ${wordsQuizData.length}`;
+        wordsQuizScoreElem.textContent = '';
+        wordsQuizNextBtn.classList.add('hidden');
+        wordsQuizFinishBtn.classList.add('hidden');
+        wordsQuizBackBtn.classList.remove('hidden');
+        return;
+      }
+      wordsQuizBackBtn.classList.add('hidden');
+      wordsQuizNextBtn.classList.add('hidden');
+      wordsQuizFinishBtn.classList.add('hidden');
+      wordsQuizFeedback.textContent = '';
+      wordsQuizScoreElem.textContent = `Score: ${wordsQuizScore} / ${wordsQuizCurrent}`;
+      const q = wordsQuizData[wordsQuizCurrent];
+      wordsQuizWord.innerHTML = `<span class="font-bold">${q.meaning}</span>`;
+      // Choices: correct + 3 random wrong
+      let wrongs = shuffleArray(commonWords.filter(w => w.word !== q.word)).slice(0, 3);
+      let options = wrongs.map(w => w.word);
+      options.push(q.word);
+      options = shuffleArray(options);
+      wordsQuizChoices.innerHTML = '';
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = opt;
+        btn.disabled = false;
+        btn.addEventListener('click', function() {
+          if (btn.disabled) return;
+          Array.from(wordsQuizChoices.children).forEach(b => b.disabled = true);
+          if (opt === q.word) {
+            btn.classList.add('correct');
+            wordsQuizFeedback.textContent = isDoubleXpActive ? 'Correct! +4 XP (2x XP)' : 'Correct! +2 XP';
+            wordsQuizScore++;
+            addXP(XP_PER_CORRECT);
+          } else {
+            btn.classList.add('incorrect');
+            wordsQuizFeedback.textContent = `Wrong! Correct answer: ${q.word}`;
+          }
+          wordsQuizScoreElem.textContent = `Score: ${wordsQuizScore} / ${wordsQuizCurrent + 1}`;
+          if (wordsQuizCurrent < wordsQuizData.length - 1) {
+            wordsQuizNextBtn.classList.remove('hidden');
+            wordsQuizFinishBtn.classList.add('hidden');
+          } else {
+            wordsQuizFinishBtn.classList.remove('hidden');
+            wordsQuizNextBtn.classList.add('hidden');
+          }
+        });
+        wordsQuizChoices.appendChild(btn);
+      });
+    }
+
+    wordsQuizNextBtn.addEventListener('click', function() {
+      wordsQuizCurrent++;
+      showWordsQuizQuestion();
+    });
+    wordsQuizFinishBtn.addEventListener('click', function() {
+      wordsQuizCurrent++;
+      showWordsQuizQuestion();
+    });
+    wordsQuizBackBtn.addEventListener('click', function() {
+      wordsQuizGame.classList.add('opacity-0');
+      setTimeout(() => {
+        wordsQuizGame.classList.add('hidden');
+        welcomeText.classList.remove('hidden');
+        welcomeText.classList.remove('opacity-0');
+      }, 500);
+    });
+
+    // --- Helper ---
+    function shuffleArray(array) {
+      let arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function setCurvedVisibility(show) {
+      curvedTop.style.display = show ? 'block' : 'none';
+    }
+// --- Initialize Green Tea System on page load ---
+loadGreenTea();
+startGreenTeaTimer();
+updateGreenTeaDisplay();
     loadProgress();
   </script>
 </body>
