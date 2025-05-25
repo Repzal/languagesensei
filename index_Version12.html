@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Language せんせい</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Akaya+Telivigala&display=swap" rel="stylesheet" />
+  <style>
+    .akaya {
+      font-family: 'Akaya Telivigala', cursive;
+    }
+    .fade-transition {
+      transition: opacity 0.5s ease;
+    }
+    input[type="checkbox"]:checked {
+      accent-color: #22c55e;
+    }
+    #xp-bar-container {
+      background: #444;
+      border-radius: 10px;
+      height: 12px;
+      width: 100%;
+      margin-top: 6px;
+      overflow: hidden;
+    }
+    #xp-bar-fill {
+      background: #facc15;
+      height: 100%;
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    .choice-btn {
+      background: #2d3748;
+      padding: 10px 16px;
+      margin: 6px 0;
+      border-radius: 10px;
+      color: white;
+      font-size: 1.5rem;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+      user-select: none;
+    }
+    .choice-btn:hover {
+      background-color: #4a5568;
+    }
+    .choice-btn.correct {
+      background-color: #22c55e;
+      border-color: #16a34a;
+      cursor: default;
+    }
+    .choice-btn.incorrect {
+      background-color: #dc2626;
+      border-color: #b91c1c;
+      cursor: default;
+    }
+    .choice-btn:disabled {
+      cursor: default;
+      opacity: 0.75;
+    }
+    /* 2x XP TIMER BOX (sidebar version) */
+    #double-xp-timer-box {
+      display: none;
+      background: #fff;
+      color: #7c3aed;
+      border: 2px solid #a78bfa;
+      border-radius: 16px;
+      padding: 12px 0;
+      font-size: 1.1rem;
+      font-weight: bold;
+      box-shadow: 0 4px 32px rgba(124,58,237,0.12);
+      min-width: 80%;
+      text-align: center;
+      letter-spacing: 1px;
+      margin: 0.5rem auto 0 auto;
+      transition: opacity 0.4s;
+      /* No Akaya font, uses default font-sans! */
+      font-family: inherit;
+    }
+    #double-xp-timer-box.show {
+      display: block;
+      opacity: 1;
+    }
+    #double-xp-timer-box.hide {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+  </style>
+</head>
+<body class="bg-[#1E1E1E] text-white font-sans flex">
+
+  <!-- Sidebar -->
+  <aside class="w-64 bg-[#2A2A2A] min-h-screen p-6 flex flex-col gap-6">
+    <!-- Streak at top -->
+    <div class="bg-[#1E1E1E] p-4 rounded-xl text-center shadow-lg">
+      <p class="text-3xl font-bold">🔥 <span id="streak-days">0</span> Day Streak!</p>
+      <div id="xp-container" class="mt-2 px-2">
+        <div id="xp-bar-container">
+          <div id="xp-bar-fill"></div>
+        </div>
+        <p id="xp-text" class="text-yellow-400 text-sm text-center mt-1">XP: 0 / 10</p>
+        <p id="total-xp-text" class="text-yellow-300 text-xs text-center mt-1">Total XP: 0</p>
+        <button id="double-xp-btn" class="mt-2 w-full bg-purple-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-purple-800 transition text-base">
+          2x XP (ad)
+        </button>
+        <div id="double-xp-timer-box">
+          <span id="double-xp-timer-text">2x XP active: 10:00</span>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold mb-2">Languages</h2>
+      <button id="lang-toggle" class="bg-red-600 text-white px-4 py-2 rounded-lg akaya text-xl w-full">
+        Japanese
+      </button>
+      <div id="lang-options" class="mt-2 space-y-2 opacity-0 hidden fade-transition pointer-events-none">
+        <button id="hiragana-btn" class="bg-red-500 text-white px-4 py-2 rounded-lg akaya text-lg w-11/12 ml-2">
+          Hiragana
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="flex-1 relative">
+    <header class="bg-[#2A2A2A] p-6 relative z-10">
+      <h1 class="text-3xl font-bold">Language せんせい</h1>
+    </header>
+    <div id="curved-top" class="absolute top-[-60px] left-0 w-full h-[120px] bg-[#2A2A2A] rounded-b-[100px] z-0 hidden"></div>
+    <div id="welcome-text" class="relative z-10 mt-16 px-6 fade-transition">
+      <div class="bg-[#2A2A2A] p-6 rounded-xl shadow-lg max-w-md mx-auto">
+        <p class="text-lg text-center">Welcome to Language せんせい!</p>
+      </div>
+    </div>
+    <div id="hiragana-section" class="relative z-10 mt-16 px-6 fade-transition hidden">
+      <div class="max-w-2xl mx-auto">
+        <div id="hiragana-grid" class="grid grid-cols-5 gap-2"></div>
+        <div class="flex justify-between mt-4">
+          <button id="select-all-btn" class="bg-green-600 px-4 py-2 rounded-lg akaya text-white hover:bg-green-700">Select All</button>
+          <button id="deselect-all-btn" class="bg-red-600 px-4 py-2 rounded-lg akaya text-white hover:bg-red-700">Deselect All</button>
+        </div>
+        <button id="start-quiz-btn" class="bg-blue-600 mt-6 w-full py-3 rounded-lg akaya text-white text-xl hover:bg-blue-700">
+          Start Quiz
+        </button>
+      </div>
+    </div>
+    <div id="quiz-container" class="relative z-10 mt-16 px-6 max-w-2xl mx-auto hidden fade-transition">
+      <p id="quiz-question" class="text-5xl akaya mb-6" style="color: white;"></p>
+      <div id="choices-container" class="flex flex-col"></div>
+      <div class="flex justify-between mt-6">
+        <button id="skip-question-btn" class="bg-yellow-500 px-4 py-2 rounded-lg akaya text-white hover:bg-yellow-600">Skip</button>
+        <button id="go-back-btn" class="bg-gray-600 px-4 py-2 rounded-lg akaya text-white hover:bg-gray-700 hidden">Go Back</button>
+      </div>
+      <p id="feedback" class="text-lg min-h-[24px] mt-4"></p>
+      <p id="score-display" class="text-lg font-bold mt-2"></p>
+    </div>
+  </div>
+
+  <script>
+    // --- Declarations ---
+    const langToggle = document.getElementById('lang-toggle');
+    const langOptions = document.getElementById('lang-options');
+    const hiraganaBtn = document.getElementById('hiragana-btn');
+    const welcomeText = document.getElementById('welcome-text');
+    const hiraganaSection = document.getElementById('hiragana-section');
+    const curvedTop = document.getElementById('curved-top');
+    const hiraganaGrid = document.getElementById('hiragana-grid');
+    const startQuizBtn = document.getElementById('start-quiz-btn');
+    const quizContainer = document.getElementById('quiz-container');
+    const quizQuestion = document.getElementById('quiz-question');
+    const choicesContainer = document.getElementById('choices-container');
+    const skipQuestionBtn = document.getElementById('skip-question-btn');
+    const feedback = document.getElementById('feedback');
+    const scoreDisplay = document.getElementById('score-display');
+    const goBackBtn = document.getElementById('go-back-btn');
+    const streakDaysEl = document.getElementById('streak-days');
+    const xpBarFill = document.getElementById('xp-bar-fill');
+    const xpText = document.getElementById('xp-text');
+    const totalXpText = document.getElementById('total-xp-text');
+    const doubleXpBtn = document.getElementById('double-xp-btn');
+    // 2x XP Timer Box
+    const doubleXpTimerBox = document.getElementById('double-xp-timer-box');
+    const doubleXpTimerText = document.getElementById('double-xp-timer-text');
+
+    const hiraganaCharacters = [
+      ['あ', 'a'], ['い', 'i'], ['う', 'u'], ['え', 'e'], ['お', 'o'],
+      ['か', 'ka'], ['き', 'ki'], ['く', 'ku'], ['け', 'ke'], ['こ', 'ko'],
+      ['さ', 'sa'], ['し', 'shi'], ['す', 'su'], ['せ', 'se'], ['そ', 'so'],
+      ['た', 'ta'], ['ち', 'chi'], ['つ', 'tsu'], ['て', 'te'], ['と', 'to'],
+      ['な', 'na'], ['に', 'ni'], ['ぬ', 'nu'], ['ね', 'ne'], ['の', 'no'],
+      ['は', 'ha'], ['ひ', 'hi'], ['ふ', 'fu'], ['へ', 'he'], ['ほ', 'ho'],
+      ['ま', 'ma'], ['み', 'mi'], ['む', 'mu'], ['め', 'me'], ['も', 'mo'],
+      ['や', 'ya'], ['ゆ', 'yu'], ['よ', 'yo'],
+      ['ら', 'ra'], ['り', 'ri'], ['る', 'ru'], ['れ', 're'], ['ろ', 'ro'],
+      ['わ', 'wa'], ['を', 'wo'], ['ん', 'n']
+    ];
+
+    let quizItems = [];
+    let currentIndex = 0;
+    let score = 0;
+    let questionMode = 0; // 0 = kana -> romaji, 1 = romaji -> kana
+
+    // XP/streak system variables
+    const XP_PER_CORRECT = 2;
+    const DAILY_XP_MAX = 10;
+    let currentXP = 0;
+    let currentStreak = 0;
+    let totalXP = 0;
+    let lastStreakDate = null;
+
+    // 2x XP system
+    let isDoubleXpActive = false;
+    let doubleXpTimeout = null;
+    let doubleXpEndTimestamp = null;
+    let doubleXpInterval = null;
+    const DOUBLE_XP_DURATION = 10 * 60 * 1000; // 10 minutes in ms
+
+    function getTodayString() {
+      const now = new Date();
+      return now.toISOString().slice(0, 10);
+    }
+
+    function loadProgress() {
+      const savedXP = localStorage.getItem('languageSenseiDailyXP');
+      const savedStreak = localStorage.getItem('languageSenseiStreakDays');
+      const savedTotalXP = localStorage.getItem('languageSenseiTotalXP');
+      const savedLastStreakDate = localStorage.getItem('languageSenseiLastStreakDate');
+      const savedDoubleXp = localStorage.getItem('languageSenseiDoubleXpUntil');
+
+      currentXP = savedXP !== null ? parseInt(savedXP, 10) : 0;
+      currentStreak = savedStreak !== null ? parseInt(savedStreak, 10) : 0;
+      totalXP = savedTotalXP !== null ? parseInt(savedTotalXP, 10) : 0;
+      lastStreakDate = savedLastStreakDate || null;
+
+      // Handle 2x XP restore
+      if (savedDoubleXp) {
+        const until = parseInt(savedDoubleXp, 10);
+        if (Date.now() < until) {
+          activateDoubleXp(until - Date.now());
+        } else {
+          deactivateDoubleXp();
+        }
+      } else {
+        deactivateDoubleXp();
+      }
+
+      if (isNaN(currentXP)) currentXP = 0;
+      if (isNaN(currentStreak)) currentStreak = 0;
+      if (isNaN(totalXP)) totalXP = 0;
+      updateProgressDisplay();
+    }
+
+    function saveProgress() {
+      localStorage.setItem('languageSenseiDailyXP', currentXP);
+      localStorage.setItem('languageSenseiStreakDays', currentStreak);
+      localStorage.setItem('languageSenseiTotalXP', totalXP);
+      localStorage.setItem('languageSenseiLastStreakDate', lastStreakDate ? lastStreakDate : '');
+    }
+
+    function updateProgressDisplay() {
+      streakDaysEl.textContent = currentStreak;
+      let percent = (currentXP / DAILY_XP_MAX) * 100;
+      if (percent > 100) percent = 100;
+      xpBarFill.style.width = percent + '%';
+      xpText.textContent = `XP: ${currentXP} / ${DAILY_XP_MAX}`;
+      totalXpText.textContent = `Total XP: ${totalXP}`;
+      doubleXpBtn.textContent = isDoubleXpActive ? "2x XP ACTIVE" : "2x XP (ad)";
+      doubleXpBtn.disabled = isDoubleXpActive;
+      doubleXpBtn.classList.toggle("opacity-60", isDoubleXpActive);
+      doubleXpBtn.classList.toggle("cursor-not-allowed", isDoubleXpActive);
+    }
+
+    function addXP(amount) {
+      let xpToAdd = isDoubleXpActive ? amount * 2 : amount;
+      currentXP += xpToAdd;
+      totalXP += xpToAdd;
+
+      let today = getTodayString();
+      let streakUpdatedToday = lastStreakDate === today;
+
+      if (currentXP >= DAILY_XP_MAX && !streakUpdatedToday) {
+        currentXP = 0;
+        currentStreak++;
+        lastStreakDate = today;
+      }
+      if (currentXP >= DAILY_XP_MAX && streakUpdatedToday) {
+        currentXP = 0;
+      }
+
+      updateProgressDisplay();
+      saveProgress();
+    }
+
+    function activateDoubleXp(duration = DOUBLE_XP_DURATION) {
+      isDoubleXpActive = true;
+      updateProgressDisplay();
+      if (doubleXpTimeout) clearTimeout(doubleXpTimeout);
+      if (doubleXpInterval) clearInterval(doubleXpInterval);
+
+      const until = Date.now() + duration;
+      doubleXpEndTimestamp = until;
+      localStorage.setItem('languageSenseiDoubleXpUntil', until.toString());
+      showDoubleXpTimer();
+
+      doubleXpTimeout = setTimeout(() => {
+        deactivateDoubleXp();
+      }, duration);
+
+      doubleXpInterval = setInterval(updateDoubleXpTimer, 1000);
+      updateDoubleXpTimer();
+    }
+
+    function deactivateDoubleXp() {
+      isDoubleXpActive = false;
+      doubleXpEndTimestamp = null;
+      updateProgressDisplay();
+      localStorage.removeItem('languageSenseiDoubleXpUntil');
+      if (doubleXpTimeout) clearTimeout(doubleXpTimeout);
+      if (doubleXpInterval) clearInterval(doubleXpInterval);
+      hideDoubleXpTimer();
+    }
+
+    function showDoubleXpTimer() {
+      doubleXpTimerBox.classList.add('show');
+      doubleXpTimerBox.classList.remove('hide');
+      updateDoubleXpTimer();
+    }
+    function hideDoubleXpTimer() {
+      doubleXpTimerBox.classList.remove('show');
+      doubleXpTimerBox.classList.add('hide');
+      setTimeout(() => {
+        doubleXpTimerBox.style.display = "none";
+        doubleXpTimerBox.classList.remove('hide');
+      }, 400);
+    }
+    function formatTimeLeft(ms) {
+      let totalSeconds = Math.max(0, Math.floor(ms / 1000));
+      let min = Math.floor(totalSeconds / 60);
+      let sec = totalSeconds % 60;
+      return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
+    }
+    function updateDoubleXpTimer() {
+      if (!isDoubleXpActive || !doubleXpEndTimestamp) return;
+      const msLeft = doubleXpEndTimestamp - Date.now();
+      if (msLeft <= 0) {
+        deactivateDoubleXp();
+        return;
+      }
+      doubleXpTimerBox.style.display = "block";
+      doubleXpTimerText.textContent = `2x XP active: ${formatTimeLeft(msLeft)}`;
+    }
+
+    // --- 2x XP Button Handler ---
+    doubleXpBtn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      if (doubleXpBtn.disabled) return;
+      activateDoubleXp();
+    });
+
+    // --- Dropdown and Quiz Logic (unchanged) ---
+    function loadHiraganaCharacters() {
+      hiraganaGrid.innerHTML = '';
+      hiraganaCharacters.forEach(([kana, romaji]) => {
+        const label = document.createElement('label');
+        label.className = "flex flex-col items-center bg-red-600 rounded-lg p-2 cursor-pointer select-none";
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = romaji;
+        checkbox.className = 'mb-1';
+        const spanKana = document.createElement('span');
+        spanKana.className = 'text-3xl akaya';
+        spanKana.textContent = kana;
+        const spanRomaji = document.createElement('span');
+        spanRomaji.className = 'text-sm';
+        spanRomaji.textContent = `(${romaji})`;
+        label.appendChild(checkbox);
+        label.appendChild(spanKana);
+        label.appendChild(spanRomaji);
+        hiraganaGrid.appendChild(label);
+      });
+    }
+
+    langToggle.addEventListener('click', function(e) {
+      if (langOptions.classList.contains('hidden')) {
+        langOptions.classList.remove('hidden');
+        setTimeout(() => {
+          langOptions.classList.add('opacity-100');
+          langOptions.classList.remove('opacity-0');
+          langOptions.classList.remove('pointer-events-none');
+          langOptions.classList.add('pointer-events-auto');
+        }, 10);
+      } else {
+        langOptions.classList.remove('opacity-100');
+        langOptions.classList.add('opacity-0');
+        langOptions.classList.remove('pointer-events-auto');
+        langOptions.classList.add('pointer-events-none');
+        setTimeout(() => langOptions.classList.add('hidden'), 500);
+      }
+    });
+
+    hiraganaBtn.addEventListener('click', function(e) {
+      welcomeText.classList.add('opacity-0');
+      setTimeout(() => {
+        welcomeText.classList.add('hidden');
+        hiraganaSection.classList.remove('hidden');
+        setTimeout(() => hiraganaSection.classList.add('opacity-100'), 10);
+        hiraganaSection.classList.remove('opacity-0');
+        loadHiraganaCharacters();
+      }, 500);
+    });
+
+    document.getElementById('select-all-btn').addEventListener('click', function(e) {
+      document.querySelectorAll('#hiragana-grid input[type="checkbox"]').forEach(cb => cb.checked = true);
+    });
+
+    document.getElementById('deselect-all-btn').addEventListener('click', function(e) {
+      document.querySelectorAll('#hiragana-grid input[type="checkbox"]').forEach(cb => cb.checked = false);
+    });
+
+    startQuizBtn.addEventListener('click', function(e) {
+      const selectedRomaji = Array.from(document.querySelectorAll('#hiragana-grid input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
+
+      if (selectedRomaji.length === 0) {
+        alert('Please select at least one character to start the quiz!');
+        return;
+      }
+
+      quizItems = hiraganaCharacters.filter(([kana, romaji]) => selectedRomaji.includes(romaji));
+      quizItems = shuffleArray(quizItems);
+      currentIndex = 0;
+      score = 0;
+      feedback.textContent = '';
+      scoreDisplay.textContent = '';
+      goBackBtn.classList.add('hidden');
+
+      hiraganaSection.classList.add('opacity-0');
+      setTimeout(() => {
+        hiraganaSection.classList.add('hidden');
+        quizContainer.classList.remove('hidden');
+        setCurvedVisibility(true);
+        setTimeout(() => quizContainer.classList.add('opacity-100'), 10);
+        quizContainer.classList.remove('opacity-0');
+        loadProgress();
+        showNextQuestion();
+      }, 500);
+    });
+
+    skipQuestionBtn.addEventListener('click', function(e) {
+      feedback.textContent = '';
+      currentIndex++;
+      showNextQuestion();
+    });
+
+    goBackBtn.addEventListener('click', function(e) {
+      quizContainer.classList.add('opacity-0');
+      setTimeout(() => {
+        quizContainer.classList.add('hidden');
+        setCurvedVisibility(false);
+        welcomeText.classList.remove('hidden');
+        welcomeText.classList.remove('opacity-0');
+      }, 500);
+    });
+
+    function setCurvedVisibility(show) {
+      curvedTop.style.display = show ? 'block' : 'none';
+    }
+
+    function shuffleArray(array) {
+      let arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function showNextQuestion() {
+      if (currentIndex >= quizItems.length) {
+        quizQuestion.textContent = 'Quiz Complete!';
+        choicesContainer.innerHTML = '';
+        feedback.textContent = `Final score: ${score} / ${quizItems.length}`;
+        scoreDisplay.textContent = '';
+        goBackBtn.classList.remove('hidden');
+        skipQuestionBtn.classList.add('hidden');
+        return;
+      }
+
+      skipQuestionBtn.classList.remove('hidden');
+      goBackBtn.classList.add('hidden');
+      scoreDisplay.textContent = `Score: ${score} / ${currentIndex}`;
+      questionMode = Math.random() < 0.5 ? 0 : 1;
+
+      const [kana, romaji] = quizItems[currentIndex];
+      let questionText, correctAnswer, allOptions = [];
+      if (questionMode === 0) {
+        questionText = kana;
+        correctAnswer = romaji;
+        const wrongOptions = hiraganaCharacters
+          .filter(item => item[1] !== correctAnswer)
+          .map(item => item[1]);
+        shuffleArray(wrongOptions);
+        allOptions = wrongOptions.slice(0, 3);
+        allOptions.push(correctAnswer);
+      } else {
+        questionText = romaji;
+        correctAnswer = kana;
+        const wrongOptions = hiraganaCharacters
+          .filter(item => item[0] !== correctAnswer)
+          .map(item => item[0]);
+        shuffleArray(wrongOptions);
+        allOptions = wrongOptions.slice(0, 3);
+        allOptions.push(correctAnswer);
+      }
+      allOptions = shuffleArray(allOptions);
+      quizQuestion.textContent = questionText;
+      choicesContainer.innerHTML = '';
+      allOptions.forEach(option => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = option;
+        btn.disabled = false;
+        btn.addEventListener('click', function() {
+          if (btn.disabled) return;
+          Array.from(choicesContainer.children).forEach(b => b.disabled = true);
+
+          if (option === correctAnswer) {
+            btn.classList.add('correct');
+            feedback.textContent = isDoubleXpActive ? 'Correct! +4 XP (2x XP)' : 'Correct! +2 XP';
+            score++;
+            addXP(XP_PER_CORRECT);
+          } else {
+            btn.classList.add('incorrect');
+            feedback.textContent = `Wrong! Correct answer: ${correctAnswer}`;
+          }
+          scoreDisplay.textContent = `Score: ${score} / ${currentIndex + 1}`;
+          setTimeout(() => {
+            feedback.textContent = '';
+            currentIndex++;
+            showNextQuestion();
+          }, 1200);
+        });
+        choicesContainer.appendChild(btn);
+      });
+    }
+
+    loadProgress();
+  </script>
+</body>
+</html>
