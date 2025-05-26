@@ -233,42 +233,88 @@
       <button id="words-quiz-back-btn" class="bg-gray-600 mx-auto px-5 py-2 rounded-lg akaya text-white text-lg hover:bg-gray-700 mt-6 hidden">Go Back</button>
     </div>
   </div>
-<!-- Inventory Modal -->
 <div id="inventory-modal" class="inventory-fade" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(20,20,20,0.6); z-index:1000; align-items:center; justify-content:center;">
-  <div style="background:#222; border-radius:16px; padding:2rem 2.5rem; min-width:320px; max-width:90vw; color:#fff; position:relative; box-shadow:0 6px 48px #000b;">
-    <button id="close-inventory-btn" style="position:absolute; top:12px; right:16px; font-size:1.7rem; background:none; border:none; color:#aaa; cursor:pointer;">&times;</button>
-    <h2 class="text-2xl font-bold mb-6 text-center">Inventory</h2>
-    <div class="flex items-center gap-4 mb-5">
-      <span style="font-size:2.4rem;">🍵</span>
-      <div>
-        <div class="font-bold text-lg">Green Tea</div>
-        <div class="text-green-300 mb-2">Count: <span id="green-tea-count-modal">0</span> / 5</div>
-        <div class="text-xs text-gray-400 mb-2">+15 XP per use</div>
-        <button onclick="useGreenTea(true)" id="use-green-tea-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold">Use Green Tea</button>
-      </div>
-      <!-- Add after the Green Tea div -->
-<div class="border-t border-gray-700 my-6"></div>
-<div class="flex items-center gap-4 mb-5">
-  <span style="font-size:2.4rem;">🍣</span>
-  <div>
-    <div class="font-bold text-lg">Sushi</div>
-    <div class="text-blue-300 mb-2">Count: <span id="sushi-count-modal">0</span> / 3</div>
-    <div class="text-xs text-gray-400 mb-2">+20 XP per use</div>
-    <div class="w-full bg-gray-700 rounded-full h-2 mb-2">
-      <div id="sushi-progress-bar" class="bg-blue-500 rounded-full h-2" style="width: 0%"></div>
-    </div>
-    <div class="text-xs text-gray-400 mb-2">Progress: <span id="sushi-progress-text">0</span>/50 XP</div>
-    <button onclick="useSushi(true)" id="use-sushi-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors">
-      Use Sushi
+  <div style="background-color: #2A2A2A;" class="rounded-lg p-6 max-w-md w-full max-h-[90vh] overflow-y-auto relative shadow-lg border border-gray-700">
+    <!-- Close button -->
+    <button id="close-inventory-btn" type="button" class="absolute top-3 right-3 text-gray-400 hover:text-white transition-colors w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-700" aria-label="Close">
+      ✕
     </button>
+    
+    <!-- Title -->
+    <h2 class="text-2xl font-bold mb-6 text-white">Inventory</h2>
+
+    <!-- Sushi Section -->
+    <div class="flex items-center gap-4 mb-5">
+      <span style="font-size:2.4rem;">🍣</span>
+      <div class="flex-1">
+        <div class="font-bold text-lg text-white">Sushi</div>
+        <div class="text-blue-300 mb-2">Count: <span id="sushi-count-modal">0</span> / 3</div>
+        <div class="text-xs text-gray-400 mb-2">+20 XP per use</div>
+        <div class="w-full bg-gray-700 rounded-full h-2 mb-2">
+          <div id="sushi-progress-bar" class="bg-blue-500 rounded-full h-2" style="width: 0%"></div>
+        </div>
+        <div class="text-xs text-gray-400 mb-2">Progress: <span id="sushi-progress-text">0</span>/50 XP</div>
+        <button onclick="useSushi(true)" id="use-sushi-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors">
+          Use Sushi
+        </button>
+      </div>
+    </div>
+
+    <!-- Egg Section -->
+    <div class="border-t border-gray-700 my-6"></div>
+    <div class="flex items-center gap-4 mb-5">
+      <span style="font-size:2.4rem;">🥚</span>
+      <div class="flex-1">
+        <div class="font-bold text-lg text-white">Mystery Egg</div>
+        <div class="text-purple-300 mb-2">
+          <span id="egg-status">No egg available</span>
+        </div>
+        <div class="w-full bg-gray-700 rounded-full h-2 mb-2">
+          <div id="egg-progress-bar" class="bg-purple-500 rounded-full h-2" style="width: 0%"></div>
+        </div>
+        <div class="text-xs text-gray-400 mb-2">Progress: <span id="egg-progress-text">0</span>/100 XP</div>
+        <button onclick="hatchEgg()" id="hatch-egg-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold transition-colors hidden">
+          Hatch Egg
+        </button>
+      </div>
+    </div>
+
+    <!-- Pet Collection -->
+    <div class="border-t border-gray-700 my-6"></div>
+    <div class="mb-4">
+      <h3 class="text-lg font-bold mb-3 text-white">Pet Collection</h3>
+      <div class="grid grid-cols-5 gap-2" id="pets-collection">
+        <!-- Pet slots will be generated here -->
+      </div>
+    </div>
   </div>
 </div>
-    </div>
-    <div class="text-gray-400 text-sm text-center">
-      Next Green Tea in: <span id="green-tea-timer">05:00</span>
-    </div>
-  </div>
-</div>
+
+<script>
+// Modal logic: open/close with correct background and close button
+function toggleInventoryModal(show = true) {
+  const modal = document.getElementById('inventory-modal');
+  if (!modal) return;
+  if (show) {
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+    updateSushiDisplays();
+    updateEggDisplays();
+    updatePetsCollection();
+  } else {
+    modal.classList.remove('show');
+    setTimeout(() => { modal.style.display = 'none'; }, 150);
+  }
+}
+document.getElementById('open-inventory-btn').onclick = () => toggleInventoryModal(true);
+document.getElementById('close-inventory-btn').onclick = () => toggleInventoryModal(false);
+// Also close modal if user clicks background (optional)
+document.getElementById('inventory-modal').addEventListener('click', function(e) {
+  if (e.target === this) toggleInventoryModal(false);
+});
+</script>
+
+
   <script>
     // --- Character Sets ---
     const hiraganaCharacters = [
@@ -437,6 +483,24 @@
     const wordsQuizFinishBtn = document.getElementById('words-quiz-finish-btn');
 
 
+const EGG_XP_REQUIREMENT = 100;
+const PETS = {
+  KITSUNE: { name: "Kitsune", emoji: "🦊", nickname: "Inari" },
+  DRAGON: { name: "Dragon", emoji: "🐲", nickname: "Ryuu" },
+  CRANE: { name: "Crane", emoji: "🦢", nickname: "Tsuru" },
+  SHIBA: { name: "Shiba Inu", emoji: "🐕", nickname: "Hachi" },
+  KOI: { name: "Koi Fish", emoji: "🐠", nickname: "Sakana" }
+};
+let hasEgg = false;
+let eggProgress = 0;
+let unlockedPets = [];
+
+// Add this near your other modal-related code
+document.getElementById('open-inventory-btn').addEventListener('click', function() {
+  updateEggDisplays();
+  updatePetsCollection();
+});
+
 // --- Green Tea Inventory System with Modal Menu ---
 let greenTeaCount = 0;
 const GREEN_TEA_MAX = 5;
@@ -450,6 +514,108 @@ const SUSHI_XP_REQUIREMENT = 50;
 const SUSHI_XP_REWARD = 20;
 let sushiCount = 0;
 let sushiProgress = 0;
+
+
+// --- Egg and Pet System ---
+function saveEggAndPets() {
+  localStorage.setItem('languageSenseiEggStatus', hasEgg.toString());
+  localStorage.setItem('languageSenseiEggProgress', eggProgress.toString());
+  localStorage.setItem('languageSenseiPets', JSON.stringify(unlockedPets));
+  console.log('Saved egg progress:', eggProgress); // Debug line
+}
+
+function loadEggAndPets() {
+  hasEgg = localStorage.getItem('languageSenseiEggStatus') === 'true';
+  eggProgress = parseInt(localStorage.getItem('languageSenseiEggProgress')) || 0;
+  unlockedPets = JSON.parse(localStorage.getItem('languageSenseiPets')) || [];
+  console.log('Loaded egg progress:', eggProgress); // Debug line
+  updateEggDisplays();
+  updatePetsCollection();
+}
+
+function updateEggProgress(xpGained) {
+  // Only update progress if we don't have an egg
+  if (!hasEgg) {
+    eggProgress += xpGained;
+    console.log('Egg progress:', eggProgress); // Debug line
+    
+    if (eggProgress >= EGG_XP_REQUIREMENT) {
+      hasEgg = true;
+      eggProgress = 0;
+      showEggMsg("🥚 You found a mysterious egg!");
+      saveEggAndPets();
+    }
+  }
+  updateEggDisplays();
+}
+
+function updateEggDisplays() {
+  const statusEl = document.getElementById('egg-status');
+  const progressBar = document.getElementById('egg-progress-bar');
+  const progressText = document.getElementById('egg-progress-text');
+  const hatchBtn = document.getElementById('hatch-egg-btn');
+  
+  if (statusEl) {
+    statusEl.textContent = hasEgg ? "Ready to hatch!" : "No egg available";
+  }
+  if (progressBar) {
+    const percent = hasEgg ? 100 : (eggProgress / EGG_XP_REQUIREMENT) * 100;
+    progressBar.style.width = `${percent}%`;
+  }
+  if (progressText) {
+    progressText.textContent = hasEgg ? "100" : String(eggProgress);
+  }
+  if (hatchBtn) {
+    hatchBtn.classList.toggle('hidden', !hasEgg);
+  }
+}
+
+function hatchEgg() {
+  if (!hasEgg) return;
+  
+  // Get available pets (ones we don't have yet)
+  const availablePets = Object.values(PETS).filter(pet => 
+    !unlockedPets.some(p => p.name === pet.name)
+  );
+  
+  if (availablePets.length === 0) {
+    showEggMsg("You've collected all pets!");
+    return;
+  }
+  
+  // Randomly select a new pet
+  const newPet = availablePets[Math.floor(Math.random() * availablePets.length)];
+  unlockedPets.push(newPet);
+  hasEgg = false;
+  
+  showEggMsg(`🎉 Your egg hatched into a ${newPet.emoji} ${newPet.name} (${newPet.nickname})!`);
+  saveEggAndPets();
+  updateEggDisplays();
+  updatePetsCollection();
+}
+
+function updatePetsCollection() {
+  const container = document.getElementById('pets-collection');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  Object.values(PETS).forEach(pet => {
+    const hasPet = unlockedPets.some(p => p.name === pet.name);
+    const div = document.createElement('div');
+    div.className = `text-center p-2 ${hasPet ? '' : 'opacity-40'}`;
+    div.innerHTML = `
+      <div class="text-2xl mb-1">${pet.emoji}</div>
+      <div class="text-xs font-bold">${pet.name}</div>
+      <div class="text-xs text-gray-400">${hasPet ? pet.nickname : '???'}</div>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function showEggMsg(msg) {
+  alert(msg);
+}
 
 function saveGreenTea() {
   localStorage.setItem('languageSenseiGreenTea', greenTeaCount);
@@ -551,12 +717,38 @@ function formatTime(ms) {
   return `${min.toString().padStart(2,"0")}:${sec.toString().padStart(2,"0")}`;
 }
 
+// Update Green Tea timer display
 function updateGreenTeaTimerDisplay() {
   const timerEl = document.getElementById('green-tea-timer');
   if (timerEl) {
-    let left = getNextGreenTeaTimeLeft();
-    timerEl.textContent = greenTeaCount >= GREEN_TEA_MAX ? "Full" : formatTime(left);
+    if (greenTeaCount >= GREEN_TEA_MAX) {
+      timerEl.textContent = "Full";
+    } else {
+      const now = Date.now();
+      const timePassed = now - greenTeaLastGiven;
+      const timeLeft = Math.max(0, GREEN_TEA_INTERVAL - timePassed);
+      const minutes = Math.floor(timeLeft / 60000);
+      const seconds = Math.floor((timeLeft % 60000) / 1000);
+      timerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
   }
+}
+
+// Start Green Tea timer
+function startGreenTeaTimer() {
+  if (greenTeaTimer) clearInterval(greenTeaTimer);
+  
+  greenTeaTimer = setInterval(() => {
+    const now = Date.now();
+    if (greenTeaCount < GREEN_TEA_MAX && (now - greenTeaLastGiven >= GREEN_TEA_INTERVAL)) {
+      greenTeaCount++;
+      greenTeaLastGiven = now;
+      saveGreenTea();
+      updateGreenTeaDisplays();
+      showGreenTeaMsg(`🍵 You received a Green Tea! (${greenTeaCount}/${GREEN_TEA_MAX})`);
+    }
+    updateGreenTeaTimerDisplay();
+  }, 1000);
 }
 
 function updateGreenTeaDisplays() {
@@ -675,46 +867,9 @@ function addXP(amount) {
   currentXP += xpToAdd;
   totalXP += xpToAdd;
 
-  // Update Sushi progress
+  // Update Sushi and Egg progress
   updateSushiProgress(xpToAdd);
-
-  let today = getTodayString();
-  let streakUpdatedToday = lastStreakDate === today;
-
-  if (currentXP >= DAILY_XP_MAX && !streakUpdatedToday) {
-    currentXP = 0;
-    currentStreak++;
-    lastStreakDate = today;
-  }
-  if (currentXP >= DAILY_XP_MAX && streakUpdatedToday) {
-    currentXP = 0;
-  }
-
-  updateProgressDisplay();
-  saveProgress(); // Make sure to save after updates
-}
-
-    function updateProgressDisplay() {
-      streakDaysEl.textContent = currentStreak;
-      let percent = (currentXP / DAILY_XP_MAX) * 100;
-      if (percent > 100) percent = 100;
-      xpBarFill.style.width = percent + '%';
-      xpText.textContent = `XP: ${currentXP} / ${DAILY_XP_MAX}`;
-      totalXpText.textContent = `Total XP: ${totalXP}`;
-      doubleXpBtn.textContent = isDoubleXpActive ? "2x XP ACTIVE" : "2x XP (ad)";
-      doubleXpBtn.disabled = isDoubleXpActive;
-      doubleXpBtn.classList.toggle("opacity-60", isDoubleXpActive);
-      doubleXpBtn.classList.toggle("cursor-not-allowed", isDoubleXpActive);
-    }
-
-    // Find your existing addXP function and add the Sushi update
-function addXP(amount) {
-  let xpToAdd = isDoubleXpActive ? amount * 2 : amount;
-  currentXP += xpToAdd;
-  totalXP += xpToAdd;
-
-  // Add this line to update Sushi progress
-  updateSushiProgress(xpToAdd);
+  updateEggProgress(xpToAdd); // Make sure this line is here
 
   let today = getTodayString();
   let streakUpdatedToday = lastStreakDate === today;
@@ -731,6 +886,19 @@ function addXP(amount) {
   updateProgressDisplay();
   saveProgress();
 }
+    function updateProgressDisplay() {
+      streakDaysEl.textContent = currentStreak;
+      let percent = (currentXP / DAILY_XP_MAX) * 100;
+      if (percent > 100) percent = 100;
+      xpBarFill.style.width = percent + '%';
+      xpText.textContent = `XP: ${currentXP} / ${DAILY_XP_MAX}`;
+      totalXpText.textContent = `Total XP: ${totalXP}`;
+      doubleXpBtn.textContent = isDoubleXpActive ? "2x XP ACTIVE" : "2x XP (ad)";
+      doubleXpBtn.disabled = isDoubleXpActive;
+      doubleXpBtn.classList.toggle("opacity-60", isDoubleXpActive);
+      doubleXpBtn.classList.toggle("cursor-not-allowed", isDoubleXpActive);
+    }
+
 
     function activateDoubleXp(duration = DOUBLE_XP_DURATION) {
       isDoubleXpActive = true;
@@ -1013,6 +1181,7 @@ function addXP(amount) {
         scoreDisplay.textContent = '';
         goBackBtn.classList.remove('hidden');
         skipQuestionBtn.classList.add('hidden');
+        
         return;
       }
 
@@ -1191,18 +1360,62 @@ function addXP(amount) {
       curvedTop.style.display = show ? 'block' : 'none';
     }
 
-    // Find where you initialize Green Tea and add:
+
 document.addEventListener('DOMContentLoaded', function() {
-  // Existing initialization code...
+  // Initialize datetime display
+  function updateDateTime() {
+    const now = new Date();
+    const formatted = now.getUTCFullYear() + '-' + 
+                     String(now.getUTCMonth() + 1).padStart(2, '0') + '-' +
+                     String(now.getUTCDate()).padStart(2, '0') + ' ' +
+                     String(now.getUTCHours()).padStart(2, '0') + ':' +
+                     String(now.getUTCMinutes()).padStart(2, '0') + ':' +
+                     String(now.getUTCSeconds()).padStart(2, '0');
+    
+    document.getElementById('current-datetime').textContent = formatted;
+  }
+  
+  setInterval(updateDateTime, 1000);
+  updateDateTime();
+  
+  // Set user login
+  document.getElementById('user-login').textContent = 'Repzal';
+  
+  // Initialize game systems
+  console.log('Initializing game systems...'); // Debug log
   loadGreenTea();
   startGreenTeaTimer();
-  updateGreenTeaDisplay();
-  // Add this:
   loadSushi();
-  
-  // Existing code...
+  loadEggAndPets();
   loadProgress();
+  
+  // Add modal update listener
+  const inventoryBtn = document.getElementById('open-inventory-btn');
+  if (inventoryBtn) {
+    inventoryBtn.addEventListener('click', function() {
+      console.log('Opening inventory...'); // Debug log
+      updateEggDisplays();
+      updatePetsCollection();
+    });
+  }
 });
+
+// Add save/load debug logs
+function saveEggAndPets() {
+  localStorage.setItem('languageSenseiEggStatus', hasEgg.toString());
+  localStorage.setItem('languageSenseiEggProgress', eggProgress.toString());
+  localStorage.setItem('languageSenseiPets', JSON.stringify(unlockedPets));
+  console.log('Saved egg data:', { hasEgg, eggProgress, unlockedPets }); // Debug log
+}
+
+function loadEggAndPets() {
+  hasEgg = localStorage.getItem('languageSenseiEggStatus') === 'true';
+  eggProgress = parseInt(localStorage.getItem('languageSenseiEggProgress')) || 0;
+  unlockedPets = JSON.parse(localStorage.getItem('languageSenseiPets')) || [];
+  console.log('Loaded egg data:', { hasEgg, eggProgress, unlockedPets }); // Debug log
+  updateEggDisplays();
+  updatePetsCollection();
+}
   </script>
 </body>
 </html>
