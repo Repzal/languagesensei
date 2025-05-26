@@ -246,6 +246,23 @@
         <div class="text-xs text-gray-400 mb-2">+15 XP per use</div>
         <button onclick="useGreenTea(true)" id="use-green-tea-btn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-bold">Use Green Tea</button>
       </div>
+      <!-- Add after the Green Tea div -->
+<div class="border-t border-gray-700 my-6"></div>
+<div class="flex items-center gap-4 mb-5">
+  <span style="font-size:2.4rem;">🍣</span>
+  <div>
+    <div class="font-bold text-lg">Sushi</div>
+    <div class="text-blue-300 mb-2">Count: <span id="sushi-count-modal">0</span> / 3</div>
+    <div class="text-xs text-gray-400 mb-2">+20 XP per use</div>
+    <div class="w-full bg-gray-700 rounded-full h-2 mb-2">
+      <div id="sushi-progress-bar" class="bg-blue-500 rounded-full h-2" style="width: 0%"></div>
+    </div>
+    <div class="text-xs text-gray-400 mb-2">Progress: <span id="sushi-progress-text">0</span>/50 XP</div>
+    <button onclick="useSushi(true)" id="use-sushi-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-bold transition-colors">
+      Use Sushi
+    </button>
+  </div>
+</div>
     </div>
     <div class="text-gray-400 text-sm text-center">
       Next Green Tea in: <span id="green-tea-timer">05:00</span>
@@ -427,6 +444,13 @@ const GREEN_TEA_INTERVAL = 15 * 60 * 1000; // 5 min in ms
 let greenTeaTimer = null;
 let greenTeaLastGiven = parseInt(localStorage.getItem('languageSenseiGreenTeaLastGiven'), 10) || Date.now();
 
+// Add near GREEN_TEA constants
+const SUSHI_MAX = 3;
+const SUSHI_XP_REQUIREMENT = 50;
+const SUSHI_XP_REWARD = 20;
+let sushiCount = 0;
+let sushiProgress = 0;
+
 function saveGreenTea() {
   localStorage.setItem('languageSenseiGreenTea', greenTeaCount);
   localStorage.setItem('languageSenseiGreenTeaLastGiven', greenTeaLastGiven);
@@ -454,6 +478,62 @@ function startGreenTeaTimer() {
       }
     }
   }, 1000);
+}
+
+// --- Sushi System ---
+function saveSushi() {
+  localStorage.setItem('languageSenseiSushi', sushiCount);
+  localStorage.setItem('languageSenseiSushiProgress', sushiProgress);
+}
+
+function loadSushi() {
+  sushiCount = parseInt(localStorage.getItem('languageSenseiSushi'), 10) || 0;
+  sushiProgress = parseInt(localStorage.getItem('languageSenseiSushiProgress'), 10) || 0;
+  updateSushiDisplays();
+}
+
+function updateSushiProgress(xpGained) {
+  sushiProgress += xpGained;
+  if (sushiProgress >= SUSHI_XP_REQUIREMENT) {
+    if (sushiCount < SUSHI_MAX) {
+      sushiCount++;
+      showSushiMsg(`🍣 You earned a Sushi! (${sushiCount}/${SUSHI_MAX})`);
+    }
+    sushiProgress = 0;
+  }
+  saveSushi();
+  updateSushiDisplays();
+}
+
+function updateSushiDisplays() {
+  const countEl = document.getElementById('sushi-count-modal');
+  const progressBar = document.getElementById('sushi-progress-bar');
+  const progressText = document.getElementById('sushi-progress-text');
+  const useButton = document.getElementById('use-sushi-btn');
+  
+  if (countEl) countEl.textContent = sushiCount;
+  if (progressBar) {
+    const percent = (sushiProgress / SUSHI_XP_REQUIREMENT) * 100;
+    progressBar.style.width = `${percent}%`;
+  }
+  if (progressText) progressText.textContent = `${sushiProgress}`;
+  if (useButton) useButton.disabled = sushiCount <= 0;
+}
+
+function useSushi(fromModal) {
+  if (sushiCount > 0) {
+    sushiCount--;
+    saveSushi();
+    updateSushiDisplays();
+    addXP(SUSHI_XP_REWARD);
+    showSushiMsg("🍣 You used a Sushi! +20 XP");
+  } else {
+    showSushiMsg("No Sushi to use!");
+  }
+}
+
+function showSushiMsg(msg) {
+  alert(msg);
 }
 
 function getNextGreenTeaTimeLeft() {
@@ -559,11 +639,60 @@ document.getElementById('close-inventory-btn').onclick = closeInventoryMenu;
     }
 
     function saveProgress() {
-      localStorage.setItem('languageSenseiDailyXP', currentXP);
-      localStorage.setItem('languageSenseiStreakDays', currentStreak);
-      localStorage.setItem('languageSenseiTotalXP', totalXP);
-      localStorage.setItem('languageSenseiLastStreakDate', lastStreakDate ? lastStreakDate : '');
+  // Fix XP saving
+  localStorage.setItem('languageSenseiDailyXP', currentXP.toString());
+  localStorage.setItem('languageSenseiStreakDays', currentStreak.toString());
+  localStorage.setItem('languageSenseiTotalXP', totalXP.toString());
+  localStorage.setItem('languageSenseiLastStreakDate', lastStreakDate || '');
+  
+  // Save Sushi progress too
+  saveSushi();
+}
+
+function loadProgress() {
+  // Load XP and streak data
+  currentXP = parseInt(localStorage.getItem('languageSenseiDailyXP')) || 0;
+  currentStreak = parseInt(localStorage.getItem('languageSenseiStreakDays')) || 0;
+  totalXP = parseInt(localStorage.getItem('languageSenseiTotalXP')) || 0;
+  lastStreakDate = localStorage.getItem('languageSenseiLastStreakDate') || null;
+
+  // Load double XP status
+  const savedDoubleXp = localStorage.getItem('languageSenseiDoubleXpUntil');
+  if (savedDoubleXp) {
+    const until = parseInt(savedDoubleXp, 10);
+    if (Date.now() < until) {
+      activateDoubleXp(until - Date.now());
+    } else {
+      deactivateDoubleXp();
     }
+  }
+
+  updateProgressDisplay();
+}
+
+function addXP(amount) {
+  let xpToAdd = isDoubleXpActive ? amount * 2 : amount;
+  currentXP += xpToAdd;
+  totalXP += xpToAdd;
+
+  // Update Sushi progress
+  updateSushiProgress(xpToAdd);
+
+  let today = getTodayString();
+  let streakUpdatedToday = lastStreakDate === today;
+
+  if (currentXP >= DAILY_XP_MAX && !streakUpdatedToday) {
+    currentXP = 0;
+    currentStreak++;
+    lastStreakDate = today;
+  }
+  if (currentXP >= DAILY_XP_MAX && streakUpdatedToday) {
+    currentXP = 0;
+  }
+
+  updateProgressDisplay();
+  saveProgress(); // Make sure to save after updates
+}
 
     function updateProgressDisplay() {
       streakDaysEl.textContent = currentStreak;
@@ -578,26 +707,30 @@ document.getElementById('close-inventory-btn').onclick = closeInventoryMenu;
       doubleXpBtn.classList.toggle("cursor-not-allowed", isDoubleXpActive);
     }
 
-    function addXP(amount) {
-      let xpToAdd = isDoubleXpActive ? amount * 2 : amount;
-      currentXP += xpToAdd;
-      totalXP += xpToAdd;
+    // Find your existing addXP function and add the Sushi update
+function addXP(amount) {
+  let xpToAdd = isDoubleXpActive ? amount * 2 : amount;
+  currentXP += xpToAdd;
+  totalXP += xpToAdd;
 
-      let today = getTodayString();
-      let streakUpdatedToday = lastStreakDate === today;
+  // Add this line to update Sushi progress
+  updateSushiProgress(xpToAdd);
 
-      if (currentXP >= DAILY_XP_MAX && !streakUpdatedToday) {
-        currentXP = 0;
-        currentStreak++;
-        lastStreakDate = today;
-      }
-      if (currentXP >= DAILY_XP_MAX && streakUpdatedToday) {
-        currentXP = 0;
-      }
+  let today = getTodayString();
+  let streakUpdatedToday = lastStreakDate === today;
 
-      updateProgressDisplay();
-      saveProgress();
-    }
+  if (currentXP >= DAILY_XP_MAX && !streakUpdatedToday) {
+    currentXP = 0;
+    currentStreak++;
+    lastStreakDate = today;
+  }
+  if (currentXP >= DAILY_XP_MAX && streakUpdatedToday) {
+    currentXP = 0;
+  }
+
+  updateProgressDisplay();
+  saveProgress();
+}
 
     function activateDoubleXp(duration = DOUBLE_XP_DURATION) {
       isDoubleXpActive = true;
@@ -1057,11 +1190,19 @@ document.getElementById('close-inventory-btn').onclick = closeInventoryMenu;
     function setCurvedVisibility(show) {
       curvedTop.style.display = show ? 'block' : 'none';
     }
-// --- Initialize Green Tea System on page load ---
-loadGreenTea();
-startGreenTeaTimer();
-updateGreenTeaDisplay();
-    loadProgress();
+
+    // Find where you initialize Green Tea and add:
+document.addEventListener('DOMContentLoaded', function() {
+  // Existing initialization code...
+  loadGreenTea();
+  startGreenTeaTimer();
+  updateGreenTeaDisplay();
+  // Add this:
+  loadSushi();
+  
+  // Existing code...
+  loadProgress();
+});
   </script>
 </body>
 </html>
